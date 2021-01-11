@@ -23,7 +23,7 @@ import java.net.Socket;
 public class MainActivity extends AppCompatActivity {
 
     ImageView fractalView;
-    EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt;
+    EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt, frames;
     Button generateFractalBt, resetValuesBt;
     String[] serverAddr;
 
@@ -40,15 +40,17 @@ public class MainActivity extends AppCompatActivity {
         serverAddressTxt = findViewById(R.id.serverAddressTxt);
         generateFractalBt = findViewById(R.id.generateFractalBt);
         resetValuesBt = findViewById(R.id.resetButton);
+        frames = findViewById(R.id.framesText);
 
         generateFractalBt.setOnClickListener((view) -> {
             serverAddr = serverAddressTxt.getText().toString().split(":");
-            getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams());
+            int frames = Integer.parseInt(String.valueOf(this.frames.getText()));
+            getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams(), frames);
         });
 
         resetValuesBt.setOnClickListener((view) -> {
-            pointXTxt.setText("-1.0");
-            pointYTxt.setText("0.0");
+            pointXTxt.setText("-1.7685374027917619472408834008472010565952062055525180562253268903921439965790");
+            pointYTxt.setText("0.0005400495035209695647102872054426089298508762991118705637984149391509006042");
             zoomTxt.setText("4.0");
             iterationsTxt.setText("500");
 
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             double newZoom = Double.parseDouble(zoomTxt.getText().toString()) / 3.2;
             zoomTxt.setText("" +newZoom);
             serverAddr = serverAddressTxt.getText().toString().split(":");
-            getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams());
+            // getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams());
         });
     }
 
@@ -94,25 +96,27 @@ public class MainActivity extends AppCompatActivity {
         return BitmapFactory.decodeByteArray(bos.toByteArray(), 0, totalBytes);
     }
 
-    public void getFractalImage(String serverName, int serverPort, String fractalParams) {
+    public void getFractalImage(String serverName, int serverPort, String fractalParams, int frames) {
         Thread thr = new Thread(() -> {
             try {
                 // open connection
                 Socket balc = new Socket(serverName, serverPort);
                 DataOutputStream out = new DataOutputStream(balc.getOutputStream());
                 DataInputStream in = new DataInputStream(balc.getInputStream());
-                // type of socket
-                out.writeChar('c');
                 //send fractal parameters to server
                 out.writeUTF(fractalParams);
                 out.flush();
-                // get fractal image
+                // todo: acaba isto palhaço
+                //for (int i = 0; i < frames; i++) {
+                    // get fractal image
                 Bitmap bmp = readImage(in);
                 // display image
                 updateGui(bmp);
+                Thread.sleep(20);
+                //}
                 // close connection
                 balc.close();
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         });
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 pointYTxt.getText().toString() + " " +
                 zoomTxt.getText().toString() + " " +
                 iterationsTxt.getText().toString() + " " +
-                "500 500";
+                "500 500 " +
+                frames.getText().toString();
     }
 }
