@@ -1,16 +1,24 @@
 package ipt.sd.fractalsdandroid;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.*;
 import java.net.Socket;
@@ -25,11 +33,34 @@ public class MainActivity extends AppCompatActivity {
     Button generateFractalBt, resetValuesBt;
     String[] serverAdr;
     int frames;
+    Button btFrag1, btFrag2;
+    public volatile Bitmap imagem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        btFrag1 = findViewById(R.id.btnFrag1);
+        btFrag2 = findViewById(R.id.btnFrag2);
+
+        FirstFragment firstFragment = new FirstFragment();
+        SecondFragment secondFragment = new SecondFragment();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, firstFragment).commit();
+
+        btFrag1.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, firstFragment).commit();
+
+        });
+
+        btFrag2.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, secondFragment).commit();
+
+        });
+
+
 
         fractalView = findViewById(R.id.imageView);
         pointXTxt = findViewById(R.id.pointXTxt);
@@ -58,19 +89,6 @@ public class MainActivity extends AppCompatActivity {
             BitmapDrawable obj = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(new byte[1], 0, 0));
             fractalView.setImageDrawable(obj);
             fractalView.postInvalidate();
-        });
-
-        // TODO: ISTO
-        fractalView.setOnClickListener((view) -> {
-            float x = Float.parseFloat(pointXTxt.getText().toString());
-            float y = Float.parseFloat(pointYTxt.getText().toString());
-            PointF currCenter = new PointF(x, y);
-            PointF newCenter = getRealCoordinates(view.getX(), view.getY(), 400, currCenter);
-            pointXTxt.setText("" + newCenter.x);
-            pointYTxt.setText("" + newCenter.y);
-            double newZoom = Double.parseDouble(zoomTxt.getText().toString()) / 3.2;
-            zoomTxt.setText("" + newZoom);
-            serverAdr = serverAddressTxt.getText().toString().split(":");
         });
     }
 
@@ -122,17 +140,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public PointF getRealCoordinates(float xx, float yy, int size, PointF center) {
-        float ws = Float.parseFloat(zoomTxt.getText().toString());
-        float pixelSize = ws / size;
-        float minX = center.x - ws / 2;
-        float miny = center.y + ws / 2;
-        float x = minX + pixelSize * xx;
-        float y = miny - pixelSize * yy;
-        return new PointF(x, y);
-    }
-
-    private String getFractalParams() {
+    private String getFractalParams(){
         return pointXTxt.getText().toString() + " " +
                 pointYTxt.getText().toString() + " " +
                 zoomTxt.getText().toString() + " " +
