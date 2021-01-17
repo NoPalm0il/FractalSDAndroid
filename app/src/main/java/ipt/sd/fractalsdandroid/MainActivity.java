@@ -1,5 +1,6 @@
 package ipt.sd.fractalsdandroid;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -7,12 +8,19 @@ import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -22,16 +30,36 @@ import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView fractalView;
-    EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt, frames;
-    Button generateFractalBt, resetValuesBt;
-    String[] serverAddr;
+    Button btFrag1, btFrag2;
+    public volatile Bitmap imagem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        btFrag1 = findViewById(R.id.btnFrag1);
+        btFrag2 = findViewById(R.id.btnFrag2);
+
+        FirstFragment firstFragment = new FirstFragment();
+        SecondFragment secondFragment = new SecondFragment();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, firstFragment).commit();
+
+        btFrag1.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, firstFragment).commit();
+
+        });
+
+        btFrag2.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, secondFragment).commit();
+
+        });
+
+
+/*
         fractalView = findViewById(R.id.imageView);
         pointXTxt = findViewById(R.id.pointXTxt);
         pointYTxt = findViewById(R.id.pointYTxt);
@@ -41,11 +69,56 @@ public class MainActivity extends AppCompatActivity {
         generateFractalBt = findViewById(R.id.generateFractalBt);
         resetValuesBt = findViewById(R.id.resetButton);
         frames = findViewById(R.id.framesText);
+*/
 
+
+
+        /*
+
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        TabItem tabDados = findViewById(R.id.dadosTab);
+        TabItem tabFractal = findViewById(R.id.fractalTab);
+        ViewPager viewPager = findViewById(R.id.viewPager);
+
+
+        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+
+        viewPager.setAdapter(pagerAdapter);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+
+         */
+
+
+
+
+
+
+
+
+
+/*
         generateFractalBt.setOnClickListener((view) -> {
             serverAddr = serverAddressTxt.getText().toString().split(":");
             int frames = Integer.parseInt(String.valueOf(this.frames.getText()));
             getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams(), frames);
+
         });
 
         resetValuesBt.setOnClickListener((view) -> {
@@ -58,22 +131,10 @@ public class MainActivity extends AppCompatActivity {
             fractalView.setImageDrawable(obj);
             fractalView.postInvalidate();
         });
-
-        // TODO: ISTO
-        fractalView.setOnClickListener((view) -> {
-            float x = Float.parseFloat(pointXTxt.getText().toString());
-            float y = Float.parseFloat(pointYTxt.getText().toString());
-            PointF currCenter = new PointF(x, y);
-            PointF newCenter = getRealCoordinates(view.getX(), view.getY(), 400, currCenter);
-            pointXTxt.setText("" + newCenter.x);
-            pointYTxt.setText("" + newCenter.y);
-            double newZoom = Double.parseDouble(zoomTxt.getText().toString()) / 3.2;
-            zoomTxt.setText("" +newZoom);
-            serverAddr = serverAddressTxt.getText().toString().split(":");
-            // getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams());
-        });
+*/
     }
 
+    /*
     private void updateGui(final Bitmap bmp) {
         Handler uiThread = new Handler(Looper.getMainLooper());
         uiThread.post(() -> {
@@ -106,14 +167,12 @@ public class MainActivity extends AppCompatActivity {
                 //send fractal parameters to server
                 out.writeUTF(fractalParams);
                 out.flush();
-                // todo: acaba isto palhaço
-                //for (int i = 0; i < frames; i++) {
-                    // get fractal image
+
                 Bitmap bmp = readImage(in);
                 // display image
                 updateGui(bmp);
                 Thread.sleep(20);
-                //}
+
                 // close connection
                 balc.close();
             } catch (IOException | InterruptedException e) {
@@ -121,16 +180,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         thr.start();
-    }
-
-    public PointF getRealCoordinates(float xx, float yy, int size, PointF center) {
-        float ws = Float.parseFloat(zoomTxt.getText().toString());
-        float pixelSize = ws / size;
-        float minX = center.x - ws / 2;
-        float miny = center.y + ws / 2;
-        float x = minX + pixelSize * xx;
-        float y = miny - pixelSize * yy;
-        return new PointF(x, y);
     }
 
     private String getFractalParams(){
@@ -141,4 +190,6 @@ public class MainActivity extends AppCompatActivity {
                 "500 500 " +
                 frames.getText().toString();
     }
+
+     */
 }
