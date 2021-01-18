@@ -2,23 +2,15 @@ package ipt.sd.fractalsdandroid;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.fragment.app.FragmentManager;
 
 import java.io.*;
 import java.net.Socket;
@@ -34,7 +26,6 @@ public class FirstFragment extends Fragment {
     String[] serverAdr;
     int frames;
 
-
     SecondFragment sFrag;
 
     public FirstFragment(){
@@ -42,8 +33,7 @@ public class FirstFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_first, container, false);
     }
@@ -65,7 +55,6 @@ public class FirstFragment extends Fragment {
         serverAddressTxt.setText(BAL_ADDRESS);
 
 
-
         generateFractalBt.setOnClickListener((view2) -> {
             serverAdr = serverAddressTxt.getText().toString().split(":");
             frames = Integer.parseInt(String.valueOf(this.framesTxt.getText()));
@@ -80,13 +69,6 @@ public class FirstFragment extends Fragment {
         });
 
     }
-
-    /*  Utils
-         ||
-         ||
-         \/
-    */
-
 
     private ArrayList<Bitmap> readFrames(ObjectInputStream input) throws IOException, InterruptedException, ClassNotFoundException {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
@@ -114,7 +96,7 @@ public class FirstFragment extends Fragment {
                 out.flush();
 
                 // get fractal image
-                act.imagem = readFrames(in);
+                act.frames = readFrames(in);
 
                 // close connection
                 balc.close();
@@ -136,5 +118,4 @@ public class FirstFragment extends Fragment {
                 "500 500 " +
                 framesTxt.getText().toString();
     }
-
 }

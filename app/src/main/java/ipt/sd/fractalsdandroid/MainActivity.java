@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
 
-    public volatile ArrayList<Bitmap> imagem;
+    public volatile ArrayList<Bitmap> frames;
     public volatile boolean refresh;
 
     @Override
