@@ -3,8 +3,7 @@ package ipt.sd.fractalsdandroid;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,10 +22,10 @@ public class FirstFragment extends Fragment {
     EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt, framesTxt;
     Button generateFractalBt, resetValuesBt;
     MainActivity act;
-    String[] serverAdr;
+    String[] serverAdr, items;
     int frames;
+    Spinner dropdown;
 
-    SecondFragment sFrag;
 
     public FirstFragment(){
 
@@ -53,6 +52,13 @@ public class FirstFragment extends Fragment {
         resetValuesBt = getView().findViewById(R.id.resetButton);
         framesTxt = getView().findViewById(R.id.framesText);
         serverAddressTxt.setText(BAL_ADDRESS);
+
+        dropdown = getView().findViewById(R.id.spinner);
+        items = new String[]{"Mandelbrot", "Julia", "Burning Ship"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, items);
+        dropdown.setAdapter(adapter);
+
 
 
         generateFractalBt.setOnClickListener((view2) -> {
