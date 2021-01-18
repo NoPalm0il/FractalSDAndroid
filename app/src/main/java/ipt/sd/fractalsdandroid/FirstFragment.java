@@ -2,6 +2,7 @@ package ipt.sd.fractalsdandroid;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,42 +20,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.FragmentManager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-
+import java.util.ArrayList;
 
 public class FirstFragment extends Fragment {
 
-    ImageView fractalView;
-    EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt, frames;
+    static final String BAL_ADDRESS = "194.210.113.23:10011";
+
+    EditText pointXTxt, pointYTxt, zoomTxt, iterationsTxt, serverAddressTxt, framesTxt;
     Button generateFractalBt, resetValuesBt;
-    String[] serverAddr;
     MainActivity act;
+    String[] serverAdr;
+    int frames;
 
 
+    SecondFragment sFrag;
 
     public FirstFragment(){
 
     }
-
-    /*@Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Transition transition = TransitionInflater.from(requireContext()).inflateTransition(R.id.imageView);
-        setSharedElementEnterTransition(transition);
-    }
-
-     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_first, container, false);
-
     }
 
     @Override
@@ -63,7 +54,6 @@ public class FirstFragment extends Fragment {
 
         act = (MainActivity) getActivity();
 
-        fractalView = getView().findViewById(R.id.imageView);
         pointXTxt = getView().findViewById(R.id.pointXTxt);
         pointYTxt = getView().findViewById(R.id.pointYTxt);
         zoomTxt = getView().findViewById(R.id.zoomTxt);
@@ -71,17 +61,15 @@ public class FirstFragment extends Fragment {
         serverAddressTxt = getView().findViewById(R.id.serverAddressTxt);
         generateFractalBt = getView().findViewById(R.id.generateFractalBt);
         resetValuesBt = getView().findViewById(R.id.resetButton);
-        frames = getView().findViewById(R.id.framesText);
+        framesTxt = getView().findViewById(R.id.framesText);
+        serverAddressTxt.setText(BAL_ADDRESS);
+
+
 
         generateFractalBt.setOnClickListener((view2) -> {
-            serverAddr = serverAddressTxt.getText().toString().split(":");
-            int frames = Integer.parseInt(String.valueOf(this.frames.getText()));
-            getFractalImage(serverAddr[0], Integer.parseInt(serverAddr[1]), getFractalParams(), frames);
-
-            SecondFragment secondFragment = new SecondFragment();
-            FragmentManager manager = getFragmentManager();
-            manager.beginTransaction().replace(R.id.container1, secondFragment).commit();
-
+            serverAdr = serverAddressTxt.getText().toString().split(":");
+            frames = Integer.parseInt(String.valueOf(this.framesTxt.getText()));
+            getFractalFrames(serverAdr[0], Integer.parseInt(serverAdr[1]), getFractalParams(), frames);
         });
 
         resetValuesBt.setOnClickListener((view2) -> {
@@ -89,60 +77,55 @@ public class FirstFragment extends Fragment {
             pointYTxt.setText("0.0005400495035209695647102872054426089298508762991118705637984149391509006042");
             zoomTxt.setText("4.0");
             iterationsTxt.setText("500");
-
-            BitmapDrawable obj = new BitmapDrawable(getResources(), BitmapFactory.decodeByteArray(new byte[1], 0, 0));
-            fractalView.setImageDrawable(obj);
-            fractalView.postInvalidate();
         });
 
     }
 
-
-
-
-    /*Utils
-        ||
-        ||
-        \/
+    /*  Utils
+         ||
+         ||
+         \/
     */
 
 
-    private Bitmap readImage(DataInputStream input) throws IOException {
-        byte[] byteArray = new byte[1024 * 1024]; // 1 MB buffer
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int bytesRead, totalBytes = 0;
+    private ArrayList<Bitmap> readFrames(ObjectInputStream input) throws IOException, InterruptedException, ClassNotFoundException {
+        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+        byte[][] byteArray; // 1 MB buffer
         //read all bytes from stream
-        while ((bytesRead = input.read(byteArray)) > 0) {
-            bos.write(byteArray, 0, bytesRead); // put byte array in memory
-            totalBytes += bytesRead; // increase total bytes
+        byteArray = (byte[][]) input.readObject();
+        for (byte[] frame : byteArray) {
+            Bitmap img = BitmapFactory.decodeByteArray(frame, 0, frame.length);
+            if (img != null)
+                bitmaps.add(img);
         }
         //builds a bitmap with byte array
-        return BitmapFactory.decodeByteArray(bos.toByteArray(), 0, totalBytes);
+        return bitmaps;
     }
 
-    public void getFractalImage(String serverName, int serverPort, String fractalParams, int frames) {
-        Thread thr = new Thread(() -> {
+    public void getFractalFrames(String serverName, int serverPort, String fractalParams, int frames) {
+        new Thread(() -> {
             try {
                 // open connection
                 Socket balc = new Socket(serverName, serverPort);
                 DataOutputStream out = new DataOutputStream(balc.getOutputStream());
-                DataInputStream in = new DataInputStream(balc.getInputStream());
+                ObjectInputStream in = new ObjectInputStream(balc.getInputStream());
                 //send fractal parameters to server
                 out.writeUTF(fractalParams);
                 out.flush();
 
-                act.imagem = readImage(in);
-                Thread.sleep(20);
+                // get fractal image
+                act.imagem = readFrames(in);
 
                 // close connection
                 balc.close();
                 out.close();
                 in.close();
-            } catch (IOException | InterruptedException e) {
+                act.refresh = true;
+                Thread.sleep(40);
+            } catch (IOException | InterruptedException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        });
-        thr.start();
+        }).start();
     }
 
     private String getFractalParams(){
@@ -151,7 +134,7 @@ public class FirstFragment extends Fragment {
                 zoomTxt.getText().toString() + " " +
                 iterationsTxt.getText().toString() + " " +
                 "500 500 " +
-                frames.getText().toString();
+                framesTxt.getText().toString();
     }
 
 }

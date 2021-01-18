@@ -1,10 +1,13 @@
 package ipt.sd.fractalsdandroid;
 
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,10 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 public class SecondFragment extends Fragment {
 
     ImageView fractalView;
     MainActivity act;
+
 
     public SecondFragment() {
         // Required empty public constructor
@@ -31,14 +37,15 @@ public class SecondFragment extends Fragment {
 
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         act = (MainActivity) getActivity();
-
         fractalView = getView().findViewById(R.id.imageView);
 
-        new atualiza().start();
+
+        atualiza act = new atualiza();
+        act.setDaemon(true);
+        act.start();
 
     }
 
@@ -52,15 +59,16 @@ public class SecondFragment extends Fragment {
         });
     }
 
-
-    public class atualiza extends Thread{
+    public class atualiza extends Thread {
         @Override
         public void run() {
-            while(!isInterrupted()){
-                if(act.imagem != null)
-                    updateGui(act.imagem);
+            while (!isInterrupted()) {
+                if (act.refresh) {
+                    new play().start();
+                    act.refresh = false;
+                }
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -68,15 +76,18 @@ public class SecondFragment extends Fragment {
         }
     }
 
+    public class play extends Thread {
+        @Override
+        public void run() {
+            ArrayList<Bitmap> frames = (ArrayList<Bitmap>) act.imagem.clone();
+            for (Bitmap name : frames) {
+                updateGui(name);
+                try {
+                    Thread.sleep(80);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
-
-//ImageView do Fractal
-
-/*<ImageView
-            android:layout_width="500dp"
-            android:layout_height="810dp" android:id="@+id/imageView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="0.651" app:layout_constraintVertical_bias="0.565"/>
-*/

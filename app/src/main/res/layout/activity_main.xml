@@ -7,8 +7,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity"
         android:id="@+id/ecraMain">
-
-    <!--<com.google.android.material.tabs.TabLayout
+    <com.google.android.material.tabs.TabLayout
             android:layout_width="409dp"
             android:layout_height="wrap_content"
             android:id="@+id/tabLayout" app:layout_constraintTop_toTopOf="parent"
@@ -27,7 +26,6 @@
                 android:text="Fractal"/>
 
     </com.google.android.material.tabs.TabLayout>
--->
     <FrameLayout
             android:layout_width="394dp"
             android:layout_height="542dp"
@@ -45,17 +43,4 @@
             app:layout_constraintVertical_bias="0.0" app:layout_constraintTop_toTopOf="@+id/flFragment">
 
     </androidx.viewpager.widget.ViewPager>
-    <Button
-            android:text="opções"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/btnFrag1"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.232" app:layout_constraintBottom_toTopOf="@+id/flFragment"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.0"/>
-    <Button
-            android:text="fractal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/btnFrag2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btnFrag1" app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
