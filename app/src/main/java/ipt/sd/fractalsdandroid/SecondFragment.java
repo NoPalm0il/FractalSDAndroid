@@ -5,13 +5,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
@@ -52,31 +52,26 @@ public class SecondFragment extends Fragment {
         });
     }
 
-    public class Update extends Thread {
+    private class Update extends Thread {
         @Override
         public void run() {
             while (!isInterrupted()) {
                 if (act.refresh) {
-                    new Play().start();
+                    new Thread(() -> {
+                        ArrayList<Bitmap> frames = (ArrayList<Bitmap>) act.frames.clone();
+                        for (Bitmap name : frames) {
+                            updateGui(name);
+                            try {
+                                Thread.sleep(40);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
                     act.refresh = false;
                 }
                 try {
                     Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public class Play extends Thread {
-        @Override
-        public void run() {
-            ArrayList<Bitmap> frames = (ArrayList<Bitmap>) act.frames.clone();
-            for (Bitmap name : frames) {
-                updateGui(name);
-                try {
-                    Thread.sleep(80);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

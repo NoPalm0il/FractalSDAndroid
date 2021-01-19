@@ -116,9 +116,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="@+id/guideline4"/>
     <Button
-            android:text="RESET VALUES"
+            android:text="ZOOM POINT"
             android:layout_width="407dp"
-            android:layout_height="48dp" android:id="@+id/resetButton"
+            android:layout_height="48dp" android:id="@+id/zoomPointBt"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/serverAddressTxt" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
@@ -142,6 +142,6 @@
             android:id="@+id/spinner"
             android:spinnerMode="dropdown"
             android:background="@android:drawable/btn_dropdown"
-            tools:layout_editor_absoluteX="-17dp" app:layout_constraintBottom_toTopOf="@+id/resetButton"
+            tools:layout_editor_absoluteX="-17dp" app:layout_constraintBottom_toTopOf="@+id/zoomPointBt"
             app:layout_constraintTop_toBottomOf="@+id/serverAddressTxt"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
